@@ -10,8 +10,8 @@ channel = 1
 SamplingRate = 44100
 chunk = 1024 * 50
 timer = 3
-DeviceNumber = 2
-result_file = "result.wav"
+DeviceNumber = 0
+result_file = "./result.wav"
 sleep = 0.01
 
 
@@ -43,27 +43,25 @@ def killstream(stream):
 
 
 def makefft(stream):
-    while True:
-        try:
-            # Get Sound Data
-            data = stream.read(chunk)
-            ndarray = np.frombuffer(data, dtype="int16")
+    # Get Sound Data
+    data = stream.read(chunk)
+    ndarray = np.frombuffer(data, dtype="int16")
 
-            # calculation FFT
-            Line_y = np.abs(np.fft.fft(ndarray))
-            Line_y2 = Line_y[0:chunk_x2]
+    # calculation FFT
+    Line_y = np.abs(np.fft.fft(ndarray))
+    Line_y2 = Line_y[0:chunk_x2]
 
-            # Show Graph
-            plt.plot(Line_x2, Line_y2)
-            plt.draw()
-            plt.pause(sleep)
-            plt.cla()
-        except KeyboardInterrupt:
-            print("終了しました")
-        break
-
+    # Show Graph
+    plt.plot(Line_x2, Line_y2)
+    plt.draw()
+    plt.pause(sleep)
+    plt.cla()
 
 if __name__ == "__main__":
     stream1 = makestream()
-    makefft(stream1)
-    killstream(stream1)
+    while True:
+        try:
+            makefft(stream1)
+        except KeyboardInterrupt:
+            break
+
