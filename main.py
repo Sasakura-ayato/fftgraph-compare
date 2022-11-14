@@ -1,5 +1,3 @@
-import wave
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pyaudio
@@ -14,11 +12,11 @@ DeviceNumber = 0
 result_file = "./result.wav"
 sleep = 0.01
 
-
 # Parameter: Graph
 Line_x = np.linspace(0, SamplingRate, chunk)
 chunk_x2 = int(chunk / 2)
-Line_x2 = Line_x[0:chunk_x2]
+Line_x2 = Line_x[100:chunk_x2]
+print(len(Line_x2))
 
 # Initialize
 audio = pyaudio.PyAudio()
@@ -42,26 +40,33 @@ def killstream(stream):
     stream.terminate()
 
 
-def makefft(stream):
+def makefft(stream, mode="draw"):
     # Get Sound Data
     data = stream.read(chunk)
     ndarray = np.frombuffer(data, dtype="int16")
 
     # calculation FFT
     Line_y = np.abs(np.fft.fft(ndarray))
-    Line_y2 = Line_y[0:chunk_x2]
+    Line_y2 = Line_y[100:chunk_x2]
 
     # Show Graph
-    plt.plot(Line_x2, Line_y2)
-    plt.draw()
-    plt.pause(sleep)
-    plt.cla()
+    if mode == "draw":
+        plt.plot(Line_x2, Line_y2)
+        plt.draw()
+        plt.pause(sleep)
+        plt.cla()
+    elif mode == "canvas":
+        fig = plt.figure(figsize=(16, 5))
+        ax = fig.add_subplot(111)
+        ax.plot(Line_x2, Line_y2)
+        return fig
+    else:
+        fig = plt.figure(figsize=(16, 5))
+        return fig
+
 
 if __name__ == "__main__":
+    plt.figure(figsize=(20, 5))
     stream1 = makestream()
     while True:
-        try:
-            makefft(stream1)
-        except KeyboardInterrupt:
-            break
-
+        makefft(stream1, "draw")
